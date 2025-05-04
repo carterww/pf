@@ -1,0 +1,116 @@
+#include <pf.h>
+#include <pf_hw_timer.h>
+
+#define CONST_ARRAY_LEN(s) (sizeof(s) / sizeof(*(s)))
+#define ECORE_PATH "/sys/bus/event_source/devices/cpu_atom/"
+#define ECORE_EV_PATH ECORE_PATH "events/"
+#define UNIT_SUFFIX_ENTRY(s) { s, sizeof(s) }
+
+/* pf_hw_timer related tables */
+const struct pf_time_suffix_entry PF_HW_TIMER_UNIT_SUFFIX[] = {
+	[PF_HW_TIMER_SEC] = UNIT_SUFFIX_ENTRY("s"),
+	[PF_HW_TIMER_MS] = UNIT_SUFFIX_ENTRY("ms"),
+	[PF_HW_TIMER_US] = UNIT_SUFFIX_ENTRY("μs"),
+	[PF_HW_TIMER_NS] = UNIT_SUFFIX_ENTRY("ns"),
+};
+const size_t PF_HW_TIMER_UNIT_SUFFIX_LENGTH =
+	CONST_ARRAY_LEN(PF_HW_TIMER_UNIT_SUFFIX);
+
+const uint64_t PF_HW_TIMER_UNIT_SEC_CONV[] = {
+	[PF_HW_TIMER_SEC] = 1,
+	[PF_HW_TIMER_MS] = 1000,
+	[PF_HW_TIMER_US] = 1000000,
+	[PF_HW_TIMER_NS] = 1000000000,
+};
+const size_t PF_HW_TIMER_UNIT_SEC_CONV_LENGTH =
+	CONST_ARRAY_LEN(PF_HW_TIMER_UNIT_SEC_CONV);
+
+const double PF_HW_TIMER_UNIT_SEC_CONV_DOUBLE[] = {
+	[PF_HW_TIMER_SEC] = 1.0,
+	[PF_HW_TIMER_MS] = 1000.0,
+	[PF_HW_TIMER_US] = 1000000.0,
+	[PF_HW_TIMER_NS] = 1000000000.0,
+};
+const size_t PF_HW_TIMER_UNIT_SEC_CONV_DOUBLE_LENGTH =
+	CONST_ARRAY_LEN(PF_HW_TIMER_UNIT_SEC_CONV_DOUBLE);
+
+/* pf perf related tables */
+const char *const PF_PERF_TYPE_HW_NAMES[] = {
+	[PERF_COUNT_HW_CPU_CYCLES] = "Raw CPU Cycles",
+	[PERF_COUNT_HW_INSTRUCTIONS] = "Instructions",
+	[PERF_COUNT_HW_CACHE_REFERENCES] = "Cache References",
+	[PERF_COUNT_HW_CACHE_MISSES] = "Cache Misses",
+	[PERF_COUNT_HW_BRANCH_INSTRUCTIONS] = "Branch Instructions",
+	[PERF_COUNT_HW_BRANCH_MISSES] = "Branch Misses",
+	[PERF_COUNT_HW_BUS_CYCLES] = "Bus Cycles",
+	[PERF_COUNT_HW_STALLED_CYCLES_FRONTEND] = "Stalled Cycles (Frontend)",
+	[PERF_COUNT_HW_STALLED_CYCLES_BACKEND] = "Stalled Cycles (Backend)",
+	[PERF_COUNT_HW_REF_CPU_CYCLES] = "Reference CPU Cycles",
+};
+const size_t PF_PERF_TYPE_HW_NAMES_LENGTH =
+	CONST_ARRAY_LEN(PF_PERF_TYPE_HW_NAMES);
+
+const char *const PF_PERF_TYPE_SW_NAMES[] = {
+	[PERF_COUNT_SW_CPU_CLOCK] = "CPU Clock",
+	[PERF_COUNT_SW_TASK_CLOCK] = "Task Clock",
+	[PERF_COUNT_SW_PAGE_FAULTS] = "Page Faults",
+	[PERF_COUNT_SW_CONTEXT_SWITCHES] = "Context Switches",
+	[PERF_COUNT_SW_CPU_MIGRATIONS] = "CPU Migrations",
+	[PERF_COUNT_SW_PAGE_FAULTS_MIN] = "Minor Page Faults",
+	[PERF_COUNT_SW_PAGE_FAULTS_MAJ] = "Major Page Faults",
+	[PERF_COUNT_SW_ALIGNMENT_FAULTS] = "Alignment Faults",
+	[PERF_COUNT_SW_EMULATION_FAULTS] = "Emulation Faults",
+	[PERF_COUNT_SW_DUMMY] = "Dummy (Nothing)",
+	[PERF_COUNT_SW_BPF_OUTPUT] = "BPF Data",
+	[PERF_COUNT_SW_CGROUP_SWITCHES] = "Context Switches (Different CGroup)",
+};
+const size_t PF_PERF_TYPE_SW_NAMES_LENGTH =
+	CONST_ARRAY_LEN(PF_PERF_TYPE_SW_NAMES);
+
+const char *const PF_PERF_TYPE_CACHE_NAMES[] = {
+	[PERF_COUNT_HW_CACHE_L1D] = "L1D Cache",
+	[PERF_COUNT_HW_CACHE_L1I] = "L1I Cache",
+	[PERF_COUNT_HW_CACHE_LL] = "Last Level Cache",
+	[PERF_COUNT_HW_CACHE_DTLB] = "Data TLB",
+	[PERF_COUNT_HW_CACHE_ITLB] = "Instruction TLB",
+	[PERF_COUNT_HW_CACHE_BPU] = "Branch Prediciton",
+	[PERF_COUNT_HW_CACHE_NODE] = "Local Memory Access",
+};
+const size_t PF_PERF_TYPE_CACHE_NAMES_LENGTH =
+	CONST_ARRAY_LEN(PF_PERF_TYPE_CACHE_NAMES);
+
+const char *const PF_PERF_TYPE_CACHE_OP_NAMES[] = {
+	[PERF_COUNT_HW_CACHE_OP_READ] = "Read",
+	[PERF_COUNT_HW_CACHE_OP_WRITE] = "Write",
+	[PERF_COUNT_HW_CACHE_OP_PREFETCH] = "Prefetch",
+};
+const size_t PF_PERF_TYPE_CACHE_OP_NAMES_LENGTH =
+	CONST_ARRAY_LEN(PF_PERF_TYPE_CACHE_OP_NAMES);
+
+const char *const PF_PERF_TYPE_CACHE_OP_RESULT_NAMES[] = {
+	[PERF_COUNT_HW_CACHE_RESULT_ACCESS] = "Accesses",
+	[PERF_COUNT_HW_CACHE_RESULT_MISS] = "Misses",
+};
+const size_t PF_PERF_TYPE_CACHE_OP_RESULT_NAMES_LENGTH =
+	CONST_ARRAY_LEN(PF_PERF_TYPE_CACHE_OP_RESULT_NAMES);
+
+const char *const PF_PERF_TYPE_HW_TO_ECORE_CONFIG_PATHS[] = {
+	[PERF_COUNT_HW_CPU_CYCLES] = ECORE_EV_PATH "cpu-cycles",
+	[PERF_COUNT_HW_INSTRUCTIONS] = ECORE_EV_PATH "instructions",
+	[PERF_COUNT_HW_CACHE_REFERENCES] = ECORE_EV_PATH "cache-references",
+	[PERF_COUNT_HW_CACHE_MISSES] = ECORE_EV_PATH "cache-misses",
+	[PERF_COUNT_HW_BRANCH_INSTRUCTIONS] = ECORE_EV_PATH
+	"branch-instructions",
+	[PERF_COUNT_HW_BRANCH_MISSES] = ECORE_EV_PATH "branch-misses",
+	[PERF_COUNT_HW_BUS_CYCLES] = ECORE_EV_PATH "bus-cycles",
+	[PERF_COUNT_HW_STALLED_CYCLES_FRONTEND] = NULL,
+	[PERF_COUNT_HW_STALLED_CYCLES_BACKEND] = NULL,
+	[PERF_COUNT_HW_REF_CPU_CYCLES] = ECORE_EV_PATH "ref-cycles",
+};
+const size_t PF_PERF_TYPE_HW_TO_ECORE_CONFIG_PATHS_LENGTH =
+	CONST_ARRAY_LEN(PF_PERF_TYPE_HW_TO_ECORE_CONFIG_PATHS);
+
+const char *PF_ECORE_TYPE_PATH = ECORE_PATH "type";
+
+#undef ECORE_EV_PATH
+#undef ECORE_PATH
