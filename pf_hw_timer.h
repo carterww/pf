@@ -52,10 +52,12 @@ inline static uint64_t pf_hw_tsc_read(void)
 	 * An lfence is required after rdtscp to ensure no instructions are executed until
 	 * rdtsc is actually read.
 	 */
-	__asm__ __volatile__("rdtscp\n"
+	__asm__ __volatile__(".intel_syntax noprefix\n"
+			     "rdtscp\n"
 			     "lfence\n"
 			     "shl rdx, 32\n"
 			     "or rax, rdx\n"
+			     ".att_syntax\n"
 			     : "=a"(val)
 			     :
 			     : "rdx", "ecx", "memory");
@@ -144,7 +146,12 @@ inline static uint64_t _pf_timer_log10_approx_overestimate(uint64_t val)
 
 	val += 1; /* bsr has undefined result if source is 0 */
 
-	__asm__ __volatile__("bsr %0, %1" : "=r"(log2_ceil) : "r"(val) :);
+	__asm__ __volatile__(".intel_syntax noprefix\n"
+			     "bsr %0, %1\n"
+			     ".att_syntax\n"
+			     : "=r"(log2_ceil)
+			     : "r"(val)
+			     :);
 	log2_ceil += (val & (val - 1)) != 0;
 
 	return ((log2_ceil * log2_log10_den) / log2_log10_scale);
